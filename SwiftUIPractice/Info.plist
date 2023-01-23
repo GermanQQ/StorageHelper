@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+   Info.plist
+   SwiftUIPractice
+
+   Created by Vadim German on 23.01.2023.
+   Copyright (c) 2023 ___ORGANIZATIONNAME___. All rights reserved.
+-->
 <plist version="1.0">
-<dict>
-	<key>NSCameraUsageDescription</key>
-	<string>Please allow access to take a picture for this product</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Please allow acces to take picture from your library</string>
-</dict>
+<dict/>
 </plist>
