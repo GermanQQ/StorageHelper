@@ -30,18 +30,6 @@ class FirebaseService{
         return "\(client)__\(products)"
     }
     
-    func getStands() async -> [Stand] {
-        var documentNames : [Stand] = []
-        // Get the documents in the collection\
-        
-        let querySnapshot = try? await db.collection(getStandsPath()).getDocuments()
-        
-        if querySnapshot != nil{
-            documentNames = querySnapshot!.documents.map{ parseDictToStand(data: $0.data()) }
-        }
-        return documentNames;
-    }
-    
     func getProductsByStand(stand: Stand, completion: @escaping ([Product]) -> Void) {
         guard(!products.isEmpty) else {
             completion([])
@@ -61,18 +49,6 @@ class FirebaseService{
         }
     }
     
-    
-    //    func getProducts() async -> [Product] {
-    //        var documentNames : [Product] = []
-    //        // Get the documents in the collection\
-    //
-    //        let querySnapshot = try? await  db.collection(getProductsPath()).getDocuments()
-    //
-    //        if querySnapshot != nil{
-    //            documentNames = querySnapshot!.documents.map{ parseDictToProduct(data: $0.data()) }
-    //        }
-    //        return documentNames;
-    //    }
     
     func createStand(stand: Stand){
         db.collection(getStandsPath()).document(stand.id).setData(stand.convertToDict())
@@ -105,16 +81,6 @@ class FirebaseService{
         }
     }
     
-    func createProduct(product: Product, standId: String, imageData: Data? ){
-        if(imageData != nil){
-            uploadImageToStorage(product, imageData)
-        }
-        
-        db.collection(getProductsPath()).document(product.barcode).setData(product.convertToDict())
-        updateProductsInStand(product: product, standId: standId)
-    }
-    
-    
     func getImageFromStorage(url: String, completion: @escaping (Data?) -> ()) {
         let storageRef = Storage.storage().reference(withPath: "client__products/\(url)")
         storageRef.getData(maxSize: 3000000) { data, error in
@@ -126,6 +92,28 @@ class FirebaseService{
                 completion(data)
             }
         }
+    }
+    
+    func getStands() async -> [Stand] {
+        var documentNames : [Stand] = []
+        //Example
+        // Get the documents in the collection\
+        
+        let querySnapshot = try? await db.collection(getStandsPath()).getDocuments()
+        
+        if querySnapshot != nil{
+            documentNames = querySnapshot!.documents.map{ parseDictToStand(data: $0.data()) }
+        }
+        return documentNames;
+    }
+    
+    func createProduct(product: Product, standId: String, imageData: Data? ){
+        if(imageData != nil){
+            uploadImageToStorage(product, imageData)
+        }
+        //Example (Functions)
+        db.collection(getProductsPath()).document(product.barcode).setData(product.convertToDict())
+        updateProductsInStand(product: product, standId: standId)
     }
     
     func updateProductsInStand(product: Product, standId: String){
