@@ -19,7 +19,7 @@ struct CreateProductView: View {
     @State private var description = ""
     @State private var stock = ""
     @State private var showAlert = false
-    @State private var image: Image?
+    @State private var image: UIImage?
     @State private var isShowingCamera = false
     @State private var sourceType: UIImagePickerController.SourceType = .camera
     
@@ -83,7 +83,13 @@ struct CreateProductView: View {
                                 }
                         }
                         HStack(alignment: .center, spacing: 5.0) {
-                            PlaceholderImage()
+                            if(image != nil){
+                                Image(uiImage: image!).resizable()
+                                    .frame(width: 80, height: 80)
+                                    .cornerRadius(8)
+                            }else{
+                                PlaceholderImage()
+                            }
                             Spacer()
                             Button(action: {
                                 self.sourceType = .camera
@@ -96,18 +102,19 @@ struct CreateProductView: View {
                             .background(Color.blue)
                             .foregroundColor(.white)
                             .cornerRadius(5)
-                            Button(action: {
-                                self.sourceType = .photoLibrary
-                                self.isShowingCamera = true
-                                print("Галерея")
-                            }) {
-                                Image(systemName: "photo.on.rectangle.angled")
-                            }
-                            .padding()
-                            .background(Color.blue)
-                            .foregroundColor(.white)
-                            .cornerRadius(5)
-                        }.sheet(isPresented: $isShowingCamera) {
+//                            Button(action: {
+//                                self.sourceType = .photoLibrary
+//                                self.isShowingCamera = true
+//                                print("Галерея")
+//                            }) {
+//                                Image(systemName: "photo.on.rectangle.angled")
+//                            }
+//                            .padding()
+//                            .background(Color.blue)
+//                            .foregroundColor(.white)
+//                            .cornerRadius(5)
+                        }
+                        .sheet(isPresented: $isShowingCamera) {
                             ImagePicker(sourceType: self.$sourceType, image: self.$image)
                         }
                     }
@@ -153,8 +160,10 @@ struct CreateProductView: View {
     }
     
     fileprivate func saveProduct() {
-        let product = self.product != nil ? product! : Product(name: name, description: description, image: "", barcode: barcode, stock: Int( stock) ?? 0)
-        FirebaseService.shared.createProduct(product: product, standId: standId)
+        let imageData = image?.jpegData(compressionQuality: 0.5);
+        let imagePath = imageData != nil ? "\(UUID().uuidString).jpg" : ""
+        let product = self.product != nil ? product! : Product(name: name, description: description, image: imagePath, barcode: barcode, stock: Int( stock) ?? 0)
+        FirebaseService.shared.createProduct(product: product, standId: standId, imageData: imageData)
         print("Product saved!")
     }
 }
@@ -167,7 +176,7 @@ struct CreateProductView: View {
 
 struct ImagePicker: UIViewControllerRepresentable {
     @Binding var sourceType: UIImagePickerController.SourceType
-    @Binding var image: Image?
+    @Binding var image: UIImage?
     
     func makeCoordinator() -> Coordinator {
         Coordinator(self)
@@ -193,24 +202,9 @@ struct ImagePicker: UIViewControllerRepresentable {
         
         func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
             if let uiImage = info[.originalImage] as? UIImage {
-                parent.image = Image(uiImage: uiImage)
-                uploadToFirebaseStorage(uiImage: uiImage)
+                parent.image = uiImage
             }
             picker.dismiss(animated: true, completion: nil)
         }
     }
-}
-
-func uploadToFirebaseStorage(uiImage: UIImage) {
-    print("Uploading")
-//    let storageRef = Storage.storage().reference().child("images/\(UUID().uuidString).jpg")
-//    if let uploadData = uiImage.jpegData(compressionQuality: 0.8) {
-//        storageRef.putData(uploadData, metadata: nil) { (metadata, error) in
-//            if error != nil {
-//                print("Error uploading image: \(error!)")
-//                return
-//            }
-//            print("Successfully uploaded image to Firebase Storage")
-//        }
-//    }
 }

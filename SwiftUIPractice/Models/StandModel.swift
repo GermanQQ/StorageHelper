@@ -8,11 +8,15 @@
 import Foundation
 
 struct Stand: Identifiable{
+    
     var id = UUID().uuidString
     var name, location: String
     var capacity: Int
     var filled: Int = 0
-    var productsIds: [String] = []
+    var productsIds: [String: [String : Any]] = [:]
+    var filledAndCapacity: String{
+        "\(filled)\\\(capacity)"
+    }
 }
 
 extension Stand{
@@ -33,6 +37,6 @@ func parseDictToStand(data: Dictionary<String, Any>)-> Stand{
                  location: data["location"] as? String ?? "",
                  capacity: data["capacity"] as? Int ?? 0,
                  filled: data["filled"] as? Int ?? 0,
-                 productsIds: data["productsIds"] as? Array ?? []
+                 productsIds: data["productsIds"] as? Dictionary ?? [:]
     )
 }

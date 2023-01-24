@@ -24,6 +24,7 @@ struct SearchProductView: View {
                 HStack {
                     TextField("Введіть баркод", text: $barcode)
                         .font(.title)
+                        .keyboardType(.numberPad)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                         .padding(.all, 10).overlay(alignment: .trailing){
                             Image(systemName: "barcode.viewfinder")
